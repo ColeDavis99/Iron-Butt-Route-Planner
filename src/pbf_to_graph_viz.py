@@ -15,6 +15,7 @@ class RoadWayHandler(osmium.SimpleHandler):
 
     def way(self, w):
         if 'highway' in w.tags and 'name' in w.tags:
+        # if 'name' in w.tags:
             name = w.tags['name']
             refs = [n.ref for n in w.nodes]
             self.road_node_ids.update(refs)
@@ -41,16 +42,18 @@ class RoadNodeHandler(osmium.SimpleHandler):
 
 # Step 1: Collect road node IDs and edges
 way_handler = RoadWayHandler()
+way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Springfield_eb1756d4-9f2c-458b-ad88-0ef32c477594.osm.pbf")
 # way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Central_US_Polygon_7ea12566-1eea-478a-8f3b-33dc53fad01e.osm.pbf", locations=True)
 # way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_Bois_Darc_5aef2215-f332-4525-a5e2-aab28e7c8ae7.osm.pbf", locations=True)
-way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_f006e4cb-88e7-4a50-ae08-2e7a1ce319a8.osm.pbf", locations=True)
+# way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_f006e4cb-88e7-4a50-ae08-2e7a1ce319a8.osm.pbf", locations=True)
 # way_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_Everton_c67e9f90-41cf-49c7-8db7-92c6afe2f4be.osm.pbf", locations=True)
 
 # Step 2: Collect only the matching node coordinates
 node_handler = RoadNodeHandler(way_handler.road_node_ids)
+node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Springfield_eb1756d4-9f2c-458b-ad88-0ef32c477594.osm.pbf")
 # node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Central_US_Polygon_7ea12566-1eea-478a-8f3b-33dc53fad01e.osm.pbf", locations=True)
 # node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_Bois_Darc_5aef2215-f332-4525-a5e2-aab28e7c8ae7.osm.pbf", locations=True)
-node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_f006e4cb-88e7-4a50-ae08-2e7a1ce319a8.osm.pbf", locations=True)
+# node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_f006e4cb-88e7-4a50-ae08-2e7a1ce319a8.osm.pbf", locations=True)
 # node_handler.apply_file("D:\Iron-Butt\OpenStreetMap_Datasets_And_Images\Ash_Grove_Everton_c67e9f90-41cf-49c7-8db7-92c6afe2f4be.osm.pbf", locations=True)
 
 # Step 3: Build the graph
@@ -66,7 +69,7 @@ print(f"Nodes: {len(G.nodes)}")
 print(f"Edges: {len(G.edges)}")
 
 # Step 4: Identify intersections (degree >= 3)
-intersection_nodes = [n for n in G.nodes if G.degree[n] >= 2]
+intersection_nodes = [n for n in G.nodes if G.degree[n] >= 3]
 
 # Step 5: Visualize
 if not G.nodes:
@@ -76,14 +79,14 @@ else:
 
     fig, ax = plt.subplots(figsize=(10, 10))
     
-    nx.draw(G, pos, node_size=1, edge_color='gray', ax=ax)
+    nx.draw(G, pos, node_size=0.25, edge_color='gray', ax=ax)
 
     # Draw red intersection nodes
     intersection_pos = [pos[n] for n in intersection_nodes]
     sc = ax.scatter(
         [x for x, y in intersection_pos],
         [y for x, y in intersection_pos],
-        c='red', s=10, label="Intersections"
+        c='red', s=5, label="Intersections"
     )
 
     # Build tooltip data
@@ -116,7 +119,7 @@ else:
 
     #debug
     for street in way_handler.whole_street:
-        if street == "West Farm Road 84":
-            print(street, way_handler.whole_street[street])
+        if street == "West University Street":
+            print(street, len(way_handler.whole_street[street]))
     
     plt.show()
